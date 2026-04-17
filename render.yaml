@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: tagflow-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    healthCheckPath: /healthz
+    envVars:
+      - key: REAL_GENERATION_ENABLED
+        value: "true"
+      - key: WEBHOOK_PATH
+        value: /telegram/webhook
+      - key: WEBHOOK_SECRET
+        generateValue: true
