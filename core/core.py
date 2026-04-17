@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from config import GEMINI_API_KEY, REAL_GENERATION_ENABLED
+from core.prompts import build_post_prompt, build_tags_prompt, build_video_idea_prompt
 
 
 def _cyrillic_score(text: str) -> int:
@@ -83,14 +84,7 @@ def _run_real_generation(prompt: str) -> str | None:
 
 def generate_video_idea(topic: str, style: str, tags_name: str | None = None, tags_content: str | None = None) -> str:
     tags_block = f"{tags_name}: {tags_content}" if tags_name and tags_content else "не использовать"
-    prompt = (
-        "Ты создаешь идею для короткого вирусного видео TikTok.\n"
-        f"Тема: {topic}\n"
-        f"Стиль: {style}\n"
-        f"Пул тегов: {tags_block}\n"
-        "Нужно: 3 hook-фразы, короткий сценарий, визуальные рекомендации и 5 релевантных хэштегов.\n"
-        "Ответ в HTML для Telegram."
-    )
+    prompt = build_video_idea_prompt(topic, style, tags_block)
     result = _run_real_generation(prompt)
     if result:
         return result
@@ -99,14 +93,7 @@ def generate_video_idea(topic: str, style: str, tags_name: str | None = None, ta
 
 def generate_post_text(topic: str, style: str, tags_name: str | None = None, tags_content: str | None = None) -> str:
     tags_block = f"{tags_name}: {tags_content}" if tags_name and tags_content else "не использовать"
-    prompt = (
-        "Ты пишешь готовый Telegram-пост.\n"
-        f"Тема: {topic}\n"
-        f"Стиль: {style}\n"
-        f"Пул тегов: {tags_block}\n"
-        "Нужно: цепкий заголовок, основной текст, мягкий CTA и релевантные хэштеги.\n"
-        "Ответ в HTML для Telegram, без сценария."
-    )
+    prompt = build_post_prompt(topic, style, tags_block)
     result = _run_real_generation(prompt)
     if result:
         return result
@@ -114,11 +101,7 @@ def generate_post_text(topic: str, style: str, tags_name: str | None = None, tag
 
 
 def generate_tags(topic: str) -> str:
-    prompt = (
-        "Подбери 5 коротких релевантных хэштегов для TikTok.\n"
-        f"Тема: {topic}\n"
-        "Верни только хэштеги одной строкой."
-    )
+    prompt = build_tags_prompt(topic)
     result = _run_real_generation(prompt)
     if result:
         return result
